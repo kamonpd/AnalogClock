@@ -77,6 +77,16 @@
     draw_NewHourHand();                   // draw hour hand
     draw_NewMinuteHand();
     draw_NewSecondHand();
+
+    TextSecond(o_tme.Second, CREF_BACKGROUND);    
+    TextSecond(n_tme.Second, CREF_TIME);
+    TextMinute(o_tme.Minute, CREF_BACKGROUND);
+    TextMinute(n_tme.Minute, CREF_TIME);
+    TextHour(o_tme.Hour, CREF_BACKGROUND);
+    TextHour(n_tme.Hour, CREF_TIME);
+
+    printDate(o_tme.Day, o_tme.Month, o_tme.Year, CREF_BACKGROUND);
+    printDate(n_tme.Day, n_tme.Month, n_tme.Year, CREF_DATE);
   }
 
   void drawFace(){

@@ -13,11 +13,42 @@ uint16_t elapse_time = 0;
 int timezone = 7 * 3600;    //ตั้งค่า TimeZone ตามเวลาประเทศไทย
 int dst = 0;                //กำหนดค่า Date Swing Time
 
+int day, month, year, h, m, s;
+//int b_h, b_m, b_s, b_day, b_month, b_year;
+
+int b_day = 12;
+int b_month = 6;
+int b_year = 1995;
+int b_h = 7;
+int b_m = 0;
+int b_s = 0;
+
+int i_year = 65;
+double x_s = (((24.00/i_year)*60*60)/31556952);
+
+int a_month[] = {29,31,28,31,30,31,30,31,31,30,31,30,31};
+
+double l_t = 0;
+double l_t_h = 0;
+double l_t_m = 0;
+double l_t_s = 0;
+
+int l_h = 0; 
+int l_m = 0; 
+int l_s = 0; 
+int l_day = 0; 
+int l_month = 0; 
+int l_year = 0;
+int sum_day = 0;
+int n_year = 0;
+int l_all_s = 0;
+
+
 SoftwareSerial mySerial(14, 4); // RX, TX
 String mes;
 
-const char* ssid = "Your_SSID";
-const char* password = "Your_Password";
+const char* ssid = "ssid";
+const char* password = "password";
 
 void setup() {
   mySerial.begin(115200);
@@ -119,18 +150,33 @@ void loop() {
   configTime(timezone, dst, "pool.ntp.org", "time.nist.gov");    //ดีงเวลาปัจจุบันจาก Server อีกครั้ง
   time_t now = time(nullptr);
   struct tm* p_tm = localtime(&now);
+
+  h = p_tm->tm_hour;
+  m = p_tm->tm_min;
+  s = p_tm->tm_sec;
+  day = p_tm->tm_mday;
+  month = p_tm->tm_mon +1;
+  year = 1900 + p_tm->tm_year;
+
+  callifetime();
   
-  mySerial.print(p_tm->tm_hour);
+  mySerial.print(h);
   mySerial.print(":");
-  mySerial.print(p_tm->tm_min);
+  mySerial.print(m);
   mySerial.print(":");
-  mySerial.print(p_tm->tm_sec);
+  mySerial.print(s);
   mySerial.print(":");
-  mySerial.print(p_tm->tm_mday);
+  mySerial.print(day);
   mySerial.print(":");
-  mySerial.print(p_tm->tm_mon +1);
+  mySerial.print(month);
   mySerial.print(":");
-  mySerial.print(p_tm->tm_year+1900);
+  mySerial.print(year);
+  mySerial.print(":");
+  mySerial.print((int)l_t_h);
+  mySerial.print(":");
+  mySerial.print((int)l_t_m);
+  mySerial.print(":");
+  mySerial.print((int)l_t_s);
   mySerial.println("");
   
   delay(1000);  

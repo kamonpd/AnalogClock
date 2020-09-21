@@ -20,7 +20,7 @@
           LCD_WR    -   A1
           LCD_RD    -   A0
   
-/**************************************************/
+///**************************************************/
 
   #include "Adafruit_GFX.h"
   #include <MCUFRIEND_kbv.h>
@@ -110,7 +110,7 @@
     initSetting();
     copyHandSet(o_hands, n_hands);
     copyTME(o_tme, n_tme);
-    calc_Hands(n_hands, n_tme); 
+    calc_Hands(n_hands, ln_tme); 
   }
 
   void loop(){    
@@ -126,9 +126,14 @@
       n_tme.Day = getValue(msg,':', 3).toInt(); 
       n_tme.Month = getValue(msg,':',4).toInt();  
       n_tme.Year = getValue(msg,':', 5).toInt();
-//      ln_tme.Hour = getValue(msg,':', 6).toInt();             // time life
-//      ln_tme.Minute = getValue(msg,':',7).toInt();  
-//      ln_tme.Second = getValue(msg,':', 8).toInt();
+      
+      ln_tme.Hour = getValue(msg,':', 6).toInt();             // time life
+      ln_tme.Minute = getValue(msg,':',7).toInt();  
+      ln_tme.Second = getValue(msg,':', 8).toInt();
+
+//      ln_tme.Hour = getValue(msg,':', 0).toInt();             // test time life
+//      ln_tme.Minute = getValue(msg,':',1).toInt();  
+//      ln_tme.Second = getValue(msg,':', 2).toInt();
        
 //      Serial.println(n_tme.Hour);
 //      Serial.println(n_tme.Minute);
@@ -137,72 +142,77 @@
 //      Serial.println(n_tme.Month);
 //      Serial.println(n_tme.Year);
  
-      calc_Hands(n_hands, n_tme);
-    
-
-    if(o_tme.Second != n_tme.Second){           // second change or time ticked
-      cdraw_SecondHand();   
-//      cdraw_HourHand();
-//      cdraw_MinuteHand();
-      draw_NewSecondHand();                     // draw new second hand
-      draw_NewMinuteHand();
-      draw_NewHourHand();
-      TextSecond(o_tme.Second, CREF_BACKGROUND);    
-      TextSecond(n_tme.Second, CREF_TIME);
+           
     }
+
+  if(o_tme.Second != n_tme.Second){           // second change or time ticked  
+    TextSecond(o_tme.Second, CREF_BACKGROUND);    
+    TextSecond(n_tme.Second, CREF_TIME);
     
-    if(o_tme.Minute != n_tme.Minute){         // minute change or minute and hour change                 
-      cdraw_HourHand();
-      cdraw_MinuteHand();
-      draw_NewMinuteHand();
-      draw_NewHourHand();
+   
+    if(o_tme.Minute != n_tme.Minute){
       TextMinute(o_tme.Minute, CREF_BACKGROUND);
       TextMinute(n_tme.Minute, CREF_TIME);
-      drawFace();
     }
 
-    if(o_tme.Hour != n_tme.Hour ){             // minute change or minute and hour change
-      cdraw_HourHand();
-      draw_NewHourHand();                    
+    if(o_tme.Hour != n_tme.Hour){
       TextHour(o_tme.Hour, CREF_BACKGROUND);
       TextHour(n_tme.Hour, CREF_TIME);
     }
 
-    if(o_tme.Second > 56 && o_tme.Second < 5 
-        || o_tme.Minute > 56 && o_tme.Minute < 5
-        || o_tme.Hour > 56 && o_tme.Hour < 5){
-      drawBrand();
-    }
-   
-    // draw hour, minute, second hands even no changes to overlap the "clear stuff"
-    printDate(n_tme.Day, n_tme.Month, n_tme.Year, CREF_DATE);
-    showTimeColon(); // draw time ':'  
-            
-    TextHour(n_tme.Hour, CREF_TIME);
-    TextMinute(n_tme.Minute, CREF_TIME);
-    TextSecond(n_tme.Second, CREF_TIME);
-    draw_NewSecondHand();                     // draw new second hand
-    draw_NewMinuteHand();
-    draw_NewHourHand();
-    drawBrand();
-    tft.fillCircle(Xo, Yo-1, 4, FACE);        // draw center dot                             
-  
-    // done with analog clock
-    // date change
     if(o_tme.Day != n_tme.Day 
-        || o_tme.Month != n_tme.Month 
-        || o_tme.Year != n_tme.Year){
-          printDate(o_tme.Day, o_tme.Month, o_tme.Year, CREF_BACKGROUND);
-          printDate(n_tme.Day, n_tme.Month, n_tme.Year, CREF_DATE);
-//          o_tme.Day = n_tme.Day;                // do not need to copy as it is copied in next loop        
+      || o_tme.Month != n_tme.Month 
+      || o_tme.Year != n_tme.Year){                
+        printDate(o_tme.Day, o_tme.Month, o_tme.Year, CREF_BACKGROUND);
+        printDate(n_tme.Day, n_tme.Month, n_tme.Year, CREF_DATE);
     }
+
+    
+          
+      
+    if(lo_tme.Second != ln_tme.Second){
+      calc_Hands(n_hands, ln_tme);
+      int x = ln_tme.Second;
+      
+      if(x>=50||x<=10){
+        drawBrand();
+      }
   
-    //done drawing, copy the struct to old struct so we clear them after
-    copyHandSet(o_hands, n_hands);
+      if (x>=20||x<=40){
+        TextSecond(n_tme.Second, CREF_TIME);
+        TextMinute(n_tme.Minute, CREF_TIME);
+        TextHour(n_tme.Hour, CREF_TIME);
+        printDate(n_tme.Day, n_tme.Month, n_tme.Year, CREF_DATE);
+        showTimeColon();
+      }
+  
+      cdraw_SecondHand(); 
+                                 
+      if(lo_tme.Minute != ln_tme.Minute) {
+        cdraw_MinuteHand();
+        cdraw_HourHand();                         
+      }
+
+     if (lo_tme.Hour != ln_tme.Hour){
+        cdraw_HourHand();         
+      }
+      
+      draw_NewHourHand();      
+      draw_NewMinuteHand();
+      draw_NewSecondHand(); 
+      tft.fillCircle(Xo, Yo-1, 4, FACE);        // draw center dot
+      
+      copyTME(lo_tme, ln_tme);
+      copyHandSet(o_hands, n_hands);
+    }
+
     copyTME(o_tme, n_tme);
 
-    delay(100);
-
-    }
-    
+  }
+      
+//      copyHandSet(o_hands, n_hands);
+//      copyTME(o_tme, n_tme);
+//      copyTME(lo_tme, ln_tme);  
+                    
+    delay(200);
   }
